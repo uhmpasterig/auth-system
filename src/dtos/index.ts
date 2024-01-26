@@ -1,5 +1,5 @@
 // User
-export * from './get-user.dto';
+export * from './get-entity.dto';
 
 // Auth
 export * from './login.dto';

@@ -9,7 +9,7 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 
-import { GetUserDto } from '@dtos/index';
+import { GetEntityDto } from '@dtos/index';
 import { UserFetchingService, UsersService } from '../services';
 import { UserSelectInterceptor } from '@/utils';
 import { Permissions } from '@/decorators/permissions.decorator';
@@ -30,8 +30,7 @@ export class UsersController {
 
   @Get('/:id')
   @Permissions('VIEW_USER')
-  @UsePipes(new ValidationPipe({ transform: true }))
-  async getUser(@Param() { id }: GetUserDto) {
+  async getUser(@Param() { id }: GetEntityDto) {
     const user = this.userFetchingService.getUserById(id);
     if (!user) {
       throw new NotFoundException();
@@ -41,8 +40,7 @@ export class UsersController {
 
   @Delete('/:id')
   @Permissions('DELETE_USER')
-  @UsePipes(new ValidationPipe({ transform: true }))
-  async deleteUser(@Param() { id }: GetUserDto) {
+  async deleteUser(@Param() { id }: GetEntityDto) {
     const user = await this.userFetchingService.getUserById(id);
     if (!user) {
       throw new NotFoundException();

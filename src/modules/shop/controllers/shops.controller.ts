@@ -1,8 +1,16 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  UsePipes,
+  ValidationPipe,
+} from '@nestjs/common';
 import { ShopService } from '../services';
-import { GetUser } from '@/decorators/user.decorator';
+import { GetUser, ShopPermissions } from '@decorators/index';
 import { User } from 'types';
-import { CreateShopDto } from '@/dtos';
+import { CreateShopDto, GetEntityDto } from '@/dtos';
 
 @Controller('shops')
 export class ShopsController {
@@ -19,5 +27,11 @@ export class ShopsController {
   @Post('/all')
   async getAllShops() {
     return await this.shopsService.getAllShops();
+  }
+
+  @Get('/:id')
+  @ShopPermissions('EDIT_SCRIPTS')
+  async getShopById(@Param() { id }: GetEntityDto) {
+    return await this.shopsService.getShopById(id);
   }
 }
