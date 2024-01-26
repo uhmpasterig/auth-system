@@ -1,0 +1,100 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum PERMISSIONS {
+  OWNER
+  VIEW_USER
+  DELETE_USER
+  EDIT_USER
+  VIEW_ALL_USERS
+  BAN_USER
+  UNBAN_USER
+
+  CREATE_SCRIPTS
+  EDIT_SCRIPTS
+  DELETE_SCRIPTS
+
+  MANAGE_LICENSES
+
+  VIEW_CUSTOMERS
+  BAN_CUSTOMERS
+}
+
+model User {
+  id       Int    @id @default(autoincrement()) @db.Integer
+  name     String @unique @db.VarChar(25)
+  email    String @unique @db.VarChar(75)
+  password String @db.VarChar(256)
+
+  permissions PERMISSIONS[]
+  banned      Boolean       @default(false)
+
+  avatar_url String? @db.VarChar(255)
+  bio        String? @db.VarChar(255)
+
+  // Timestamps
+  created_at DateTime @default(now()) @db.Timestamp(6)
+  updated_at DateTime @default(now()) @updatedAt @db.Timestamp(6)
+
+  owned_shops      Shop[]
+  shop_permissions UserShopPermissions[]
+
+  // License
+  licenses License[]
+}
+
+model Shop {
+  id      Int      @id @default(autoincrement()) @db.Integer
+  scripts Script[]
+
+  owner    User @relation(fields: [owner_id], references: [id])
+  owner_id Int  @db.Integer
+
+  userPermissions UserShopPermissions[]
+
+  created_at DateTime @default(now()) @db.Timestamp(6)
+  updated_at DateTime @default(now()) @updatedAt @db.Timestamp(6)
+}
+
+model UserShopPermissions {
+  id      Int  @id @default(autoincrement()) @db.Integer
+  user    User @relation(fields: [user_id], references: [id])
+  user_id Int  @db.Integer
+
+  shop    Shop @relation(fields: [shop_id], references: [id])
+  shop_id Int  @db.Integer
+
+  permissions PERMISSIONS[]
+}
+
+model Script {
+  id      Int  @id @default(autoincrement()) @db.Integer
+  shop    Shop @relation(fields: [shop_id], references: [id])
+  shop_id Int  @db.Integer
+
+  licenses License[]
+
+  created_at DateTime @default(now()) @db.Timestamp(6)
+  updated_at DateTime @default(now()) @updatedAt @db.Timestamp(6)
+}
+
+model License {
+  id        Int    @id @default(autoincrement()) @db.Integer
+  user      User   @relation(fields: [user_id], references: [id])
+  user_id   Int    @db.Integer
+  script    Script @relation(fields: [script_id], references: [id])
+  script_id Int    @db.Integer
+
+  ips String[]
+
+  @@index([user_id, script_id])
+}
