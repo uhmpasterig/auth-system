@@ -8,11 +8,13 @@ import { AuthModule } from './modules/auth';
 import { UserModule } from './modules/user';
 
 import { ConfigModule } from '@nestjs/config';
+import { ShopModule } from './modules/shop';
 
 @Module({
   imports: [
     AuthModule,
     UserModule,
+    ShopModule,
     JwtModule,
     DatabaseModule,
     ConfigModule.forRoot({ isGlobal: true }),
