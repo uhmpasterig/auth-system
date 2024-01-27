@@ -9,6 +9,7 @@ import { UserModule } from './modules/user';
 
 import { ConfigModule } from '@nestjs/config';
 import { ShopModule } from './modules/shop';
+import { StripeModule } from './modules/payment/stripe.module';
 
 @Module({
   imports: [
@@ -17,6 +18,9 @@ import { ShopModule } from './modules/shop';
     ShopModule,
     JwtModule,
     DatabaseModule,
+    StripeModule.forRoot(process.env.STRIPE_SECRET_KEY, {
+      apiVersion: '2023-10-16',
+    }),
     ConfigModule.forRoot({ isGlobal: true }),
   ],
   controllers: [],
