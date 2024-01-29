@@ -2,6 +2,10 @@
 /dist
 /node_modules
 
+# Prisma
+/prisma/migrations/*
+/postgres-data/*
+
 .env
 .env.local
 

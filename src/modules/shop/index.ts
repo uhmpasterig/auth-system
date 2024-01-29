@@ -1,2 +1,2 @@
-export * from './services';
 export * from './shop.module';
+export * from './services';

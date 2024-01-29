@@ -1,18 +1,19 @@
 import { Module } from '@nestjs/common';
 import { ShopsController } from './controllers';
-import { ShopService } from './services';
+import { ShopsService, ShopsFetchingService } from './services';
 import { APP_GUARD } from '@nestjs/core';
 import { ShopPermissionsGuard } from '@/guards';
 
 @Module({
   controllers: [ShopsController],
   providers: [
-    ShopService,
+    ShopsService,
+    ShopsFetchingService,
     {
       provide: APP_GUARD,
       useClass: ShopPermissionsGuard,
     },
   ],
-  exports: [ShopService],
+  exports: [ShopsService],
 })
 export class ShopModule {}

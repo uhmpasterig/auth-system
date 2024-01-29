@@ -8,7 +8,7 @@ import { RegisterDto, LoginDto } from '../../dtos';
 import * as argon2 from 'argon2';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@modules/jwt';
-import { UserFetchingService } from '@modules/user/services/user-fetching.service';
+import { UserFetchingService } from '@/modules/user/services/users-fetching.service';
 
 @Injectable()
 export class AuthService {

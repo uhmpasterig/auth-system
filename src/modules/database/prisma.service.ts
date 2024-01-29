@@ -1,7 +1,7 @@
 import { Injectable, OnModuleInit } from '@nestjs/common';
 import { PrismaClient } from '@prisma/client';
 import { HttpException, HttpStatus } from '@nestjs/common';
-import { Prisma } from '@prisma/client';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 
 @Injectable()
 export class PrismaService extends PrismaClient implements OnModuleInit {
@@ -9,7 +9,7 @@ export class PrismaService extends PrismaClient implements OnModuleInit {
     await this.$connect();
   }
 
-  handleError(e: Prisma.PrismaClientKnownRequestError): never {
+  handleError(e: PrismaClientKnownRequestError): never {
     switch (e.code) {
       case 'P2025':
         throw new HttpException('Invalid user id', HttpStatus.BAD_REQUEST);
@@ -37,7 +37,7 @@ export class PrismaService extends PrismaClient implements OnModuleInit {
     try {
       return await operation;
     } catch (e) {
-      if (e instanceof Prisma.PrismaClientKnownRequestError) {
+      if (e instanceof PrismaClientKnownRequestError) {
         this.handleError(e);
       } else {
         throw e;
