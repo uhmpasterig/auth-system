@@ -56,11 +56,11 @@ export class StripeService {
     });
 
     await this.prismaService.handleOperation(
-      this.prismaService.stripeSessions.create({
+      this.prismaService.stripeSession.create({
         data: {
           stripe_session_id: session.id,
-          user_id: Number(userId),
-          shop_id: Number(shopId),
+          user_id: Number(user.id),
+          shop_id: Number(shop.id),
         },
       }),
     );
@@ -82,7 +82,7 @@ export class StripeService {
     if (!subscription) return;
 
     const prismaSession = await this.prismaService.handleOperation(
-      this.prismaService.stripeSessions.findUnique({
+      this.prismaService.stripeSession.findUnique({
         where: {
           stripe_session_id: sessionId,
         },

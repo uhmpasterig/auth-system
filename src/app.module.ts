@@ -1,15 +1,8 @@
 import { Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
 
 // Custom Modules
-import { JwtModule } from './modules/jwt';
-import { DatabaseModule } from './modules/database';
-
-import { AuthModule } from './modules/auth';
-import { UserModule } from './modules/user';
-
-import { ConfigModule } from '@nestjs/config';
-import { ShopModule } from './modules/shop';
-import { StripeModule } from './modules/payment/stripe.module';
+import { StripeModule, ShopModule, JwtModule, DatabaseModule, AuthModule, UserModule } from '@modules/index';
 
 @Module({
   imports: [

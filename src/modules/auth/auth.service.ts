@@ -1,32 +1,18 @@
-import {
-  BadRequestException,
-  Injectable,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { PrismaService } from '@modules/database';
-import { RegisterDto, LoginDto } from '../../dtos';
-import * as argon2 from 'argon2';
+import { RegisterDto, LoginDto } from '@dtos/index';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@modules/jwt';
-import { UserFetchingService } from '@/modules/user/services/users-fetching.service';
+import { UsersFetchingService } from '@modules/user';
+import { hash, verify } from '@utils/hashing';
 
 @Injectable()
 export class AuthService {
-  private HASHING_OPTIONS = {
-    type: argon2.argon2id,
-    memoryCost: 4096,
-    timeCost: 4,
-    parallelism: 2,
-    saltLength: 16,
-    secret: Buffer.from(this.configService.get<string>('ARGON2_SECRET')),
-    salt: Buffer.from(this.configService.get<string>('ARGON2_SALT')),
-  };
-
   constructor(
     private prismaService: PrismaService,
     private configService: ConfigService,
     private jwtService: JwtService,
-    private userFetchingService: UserFetchingService,
+    private usersFetchingService: UsersFetchingService,
   ) {}
 
   private async getTokenForUser(id: number) {
@@ -37,11 +23,11 @@ export class AuthService {
 
   async register(registerDto: RegisterDto) {
     const { email, name, password } = registerDto;
-    const hashedPassword = await argon2.hash(password, this.HASHING_OPTIONS);
-    if (await this.userFetchingService.getUserByEmail(email)) {
+    const hashedPassword = await hash(password);
+    if (await this.usersFetchingService.getUserByEmail(email)) {
       throw new BadRequestException('Email already exists');
     }
-    if (await this.userFetchingService.getUserByName(name)) {
+    if (await this.usersFetchingService.getUserByName(name)) {
       throw new BadRequestException('Username already exists');
     }
 
@@ -60,7 +46,7 @@ export class AuthService {
 
   async login(loginDto: LoginDto) {
     const { email, name, password } = loginDto;
-    const user = await this.userFetchingService.getUserByEmailOrName({
+    const user = await this.usersFetchingService.getUserByEmailOrName({
       email,
       name,
     });
@@ -71,11 +57,7 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    const isPasswordValid = await argon2.verify(
-      user.password,
-      password,
-      this.HASHING_OPTIONS,
-    );
+    const isPasswordValid = await verify(password, user.password);
     if (!isPasswordValid) {
       throw new UnauthorizedException('Invalid credentials');
     }

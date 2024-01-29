@@ -1,5 +1,5 @@
-import { CreateShopDto } from '@/dtos';
-import { PrismaService } from '@/modules/database';
+import { CreateShopDto } from '@dtos/index';
+import { PrismaService } from '@modules/database';
 import { Injectable } from '@nestjs/common';
 import { User } from 'types';
 

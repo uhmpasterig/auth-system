@@ -1,4 +1,4 @@
-import { PrismaService } from '@/modules/database';
+import { PrismaService } from '@modules/database';
 import { SHOP_PERMISSIONS_KEY } from '@decorators/shop-permissions.decorator';
 import { Injectable, CanActivate, ExecutionContext } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
@@ -13,10 +13,10 @@ export class ShopPermissionsGuard implements CanActivate {
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    const requiredPermissions = this.reflector.getAllAndOverride<PERMISSIONS[]>(
-      SHOP_PERMISSIONS_KEY,
-      [context.getHandler(), context.getClass()],
-    );
+    const requiredPermissions = this.reflector.getAllAndOverride<PERMISSIONS[]>(SHOP_PERMISSIONS_KEY, [
+      context.getHandler(),
+      context.getClass(),
+    ]);
     if (!requiredPermissions) {
       return true;
     }
@@ -25,9 +25,7 @@ export class ShopPermissionsGuard implements CanActivate {
     if (!user) {
       return false;
     }
-    const shopId = Number(
-      request.params.id || request.body.shopId || request.query.id,
-    );
+    const shopId = Number(request.params.id || request.body.shopId || request.query.id);
     if (!shopId) {
       return false;
     }
@@ -45,7 +43,7 @@ export class ShopPermissionsGuard implements CanActivate {
     }
 
     const userShopPermissions = await this.prismaService.handleOperation(
-      this.prismaService.userShopPermissions.findFirst({
+      this.prismaService.userShopPermission.findFirst({
         where: {
           user_id: user.id,
           shop_id: shopId,
@@ -56,9 +54,7 @@ export class ShopPermissionsGuard implements CanActivate {
       return false;
     }
 
-    const hasPermission = requiredPermissions.every(
-      (permission) => userShopPermissions.permissions?.includes(permission),
-    );
+    const hasPermission = requiredPermissions.every((permission) => userShopPermissions.permissions?.includes(permission));
 
     return hasPermission;
   }

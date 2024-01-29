@@ -1,12 +1,28 @@
 import { DynamicModule, Module, Provider } from '@nestjs/common';
 import Stripe from 'stripe';
 import { StripeController } from './controllers/stripe.controller';
-import { StripeService } from './services/stripe.service';
-import { StripeWebhookService } from './services/stripe-webhook.service';
+import { StripeService } from './services';
 import { UsersFetchingService } from '@modules/user';
 import { ShopsFetchingService } from '@modules/shop';
+import { StripeWebhookHandlersModule, StripeWebhookHandlersService, StripeWebhookService } from './webhook';
 
-@Module({})
+@Module({
+  imports: [StripeWebhookHandlersModule],
+  controllers: [StripeController],
+  providers: [
+    StripeService,
+    StripeWebhookService,
+    
+    // Webhook
+    StripeWebhookService,
+    StripeWebhookHandlersService,
+
+    // Fetching
+    UsersFetchingService,
+    ShopsFetchingService,
+  ],
+  exports: [StripeService, StripeWebhookService],
+})
 export class StripeModule {
   static forRoot(apiKey: string, config: Stripe.StripeConfig): DynamicModule {
     const stripe = new Stripe(apiKey, config);
@@ -17,10 +33,8 @@ export class StripeModule {
 
     return {
       module: StripeModule,
-      providers: [stripeProvider, StripeService, StripeWebhookService, UsersFetchingService, ShopsFetchingService],
-      exports: [stripeProvider, StripeService, StripeWebhookService],
-      controllers: [StripeController],
-      global: true,
+      providers: [stripeProvider],
+      exports: [stripeProvider],
     };
   }
 }

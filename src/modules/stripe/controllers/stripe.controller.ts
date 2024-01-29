@@ -1,12 +1,11 @@
-import { GetUser, Public } from '@/decorators';
-import { Body, Controller, Get, Inject, Post, Query, Req, Res, UseInterceptors } from '@nestjs/common';
+import { Public } from '@decorators/index';
+import { Controller, Get, Inject, Post, Query, Req, Res } from '@nestjs/common';
 import Stripe from 'stripe';
-import { User } from 'types';
 import { StripeService } from '../services/stripe.service';
-import { StripeWebhookService } from '../services/stripe-webhook.service';
-import { StripeCreateSessionDto, StripePaymentDoneDto } from '@/dtos';
+import { StripeCreateSessionDto, StripePaymentDoneDto } from '@dtos/index';
 import { ConfigService } from '@nestjs/config';
 import { Response, Request } from 'express';
+import { StripeWebhookService } from '../webhook/webhook.service';
 
 @Controller('stripe')
 export class StripeController {
@@ -43,7 +42,7 @@ export class StripeController {
       return;
     }
 
-    await this.stripeWebhookService.handleStripeWebhook(event);
+    this.stripeWebhookService.processStripeWebhook(event);
 
     res.json({ received: true });
   }

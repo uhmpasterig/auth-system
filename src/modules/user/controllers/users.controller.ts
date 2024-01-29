@@ -10,28 +10,28 @@ import {
 } from '@nestjs/common';
 
 import { GetEntityDto } from '@dtos/index';
-import { UserFetchingService, UsersService } from '../services';
-import { UserSelectInterceptor } from '@/utils';
-import { Permissions } from '@/decorators/permissions.decorator';
+import { UsersFetchingService, UsersService } from '../services';
+import { UserSelectInterceptor } from '@utils/index';
+import { Permissions } from '@decorators/permissions.decorator';
 
 @Controller('users')
 @UseInterceptors(UserSelectInterceptor())
 export class UsersController {
   constructor(
     private readonly usersService: UsersService,
-    private readonly userFetchingService: UserFetchingService,
+    private readonly usersFetchingService: UsersFetchingService,
   ) {}
 
   @Get('/')
   @Permissions('VIEW_ALL_USERS')
   async getUsers() {
-    return this.userFetchingService.getUsers();
+    return this.usersFetchingService.getUsers();
   }
 
   @Get('/:id')
   @Permissions('VIEW_USER')
   async getUser(@Param() { id }: GetEntityDto) {
-    const user = this.userFetchingService.getUserById(id);
+    const user = this.usersFetchingService.getUserById(id);
     if (!user) {
       throw new NotFoundException();
     }
@@ -41,7 +41,7 @@ export class UsersController {
   @Delete('/:id')
   @Permissions('DELETE_USER')
   async deleteUser(@Param() { id }: GetEntityDto) {
-    const user = await this.userFetchingService.getUserById(id);
+    const user = await this.usersFetchingService.getUserById(id);
     if (!user) {
       throw new NotFoundException();
     }
